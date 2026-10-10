@@ -3,6 +3,7 @@
 # ============================================
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
 import os
 import config
 from video_generator import create_animated_video
@@ -12,6 +13,24 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = config.SECRET_KEY
 app.config["UPLOAD_FOLDER"] = "uploads"
 app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024  # 200 MB max
+
+# ---------- DATABASE CONFIGURATION ----------
+os.makedirs("data", exist_ok=True)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(os.getcwd(), "data", "videos.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
+
+# ---------- DATABASE MODELS ----------
+
+class Video(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    script = db.Column(db.Text)
+    language = db.Column(db.String(10))
+    style = db.Column(db.String(50))
+    video_name = db.Column(db.String(200))
+    video_path = db.Column(db.String(300))
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
 
 # ---------- ROUTES ----------
@@ -55,6 +74,20 @@ def generate():
             api_key=config.POLLINATIONS_API_KEY,
             voice_source=voice_source
         )
+        
+        # Database mein save karo
+        try:
+            new_video = Video(
+                script=script,
+                language=language,
+                style=style,
+                video_name=video_name,
+                video_path=output_path
+            )
+            db.session.add(new_video)
+            db.session.commit()
+        except Exception as db_error:
+            print(f"⚠️ Database save error: {db_error}")
         
         return jsonify({
             "success": True,
@@ -175,6 +208,20 @@ def generate_with_voice():
             uploaded_voice_path=voice_path
         )
         
+        # Database mein save karo
+        try:
+            new_video = Video(
+                script=script,
+                language="ur",
+                style=style,
+                video_name=video_name,
+                video_path=output_path
+            )
+            db.session.add(new_video)
+            db.session.commit()
+        except Exception as db_error:
+            print(f"⚠️ Database save error: {db_error}")
+        
         return jsonify({
             "success": True,
             "message": "Video ready!",
@@ -198,6 +245,9 @@ if __name__ == "__main__":
     os.makedirs("temp", exist_ok=True)
     os.makedirs("uploads", exist_ok=True)
     os.makedirs("uploads/videos", exist_ok=True)
+    
+    with app.app_context():
+        db.create_all()
     
     print("\n" + "=" * 50)
     print("🎬 Script2Video AI - Web Server")
