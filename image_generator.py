@@ -12,17 +12,6 @@ def generate_ai_image(prompt, output_path, width=1920, height=1080,
                       model="flux", api_key=None):
     """
     Pollinations.ai se AI image generate karo.
-    
-    Args:
-        prompt (str): Image ka description
-        output_path (str): Kahan save karna hai
-        width (int): Image width
-        height (int): Image height
-        model (str): "flux", "turbo", "zimage"
-        api_key (str): Pollinations API key (optional)
-    
-    Returns:
-        str: Image file ka path
     """
     
     # URL encode karo
@@ -58,6 +47,19 @@ def generate_ai_image(prompt, output_path, width=1920, height=1080,
         # Image save karo
         with open(output_path, "wb") as f:
             f.write(response.content)
+        
+        # Resize karo (agar zaroorat ho) - FIXED for new Pillow
+        img = Image.open(output_path)
+        if img.size != (width, height):
+            # Naya Pillow version ke liye
+            try:
+                resample_filter = Image.Resampling.LANCZOS
+            except AttributeError:
+                # Purane Pillow ke liye fallback
+                resample_filter = Image.LANCZOS
+            
+            img = img.resize((width, height), resample_filter)
+            img.save(output_path)
         
         print(f"✅ AI image ready: {output_path}")
         return output_path
@@ -130,7 +132,6 @@ if __name__ == "__main__":
     print("🎬 Script2Video AI - AI Image Generator Test")
     print("=" * 50)
     
-    # API key config se lo
     API_KEY = getattr(config, "POLLINATIONS_API_KEY", None)
     
     if API_KEY:
@@ -138,7 +139,6 @@ if __name__ == "__main__":
     else:
         print("⚠️ API key nahi mili — fallback use hoga")
     
-    # Test 1: Single AI image
     generate_ai_image(
         prompt="a beautiful sunset over mountains, cinematic, 4k",
         output_path="output/test_ai_image.jpg",
@@ -147,7 +147,6 @@ if __name__ == "__main__":
         api_key=API_KEY
     )
     
-    # Test 2: Multiple scenes
     test_scenes = [
         "a beautiful sunset over mountains, cinematic",
         "a busy city street at night, neon lights",
