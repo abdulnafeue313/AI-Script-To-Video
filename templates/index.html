@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script2Video AI - Luxury AI Video Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Script2Video AI</h1>
+            <p>Transform your scripts into stunning AI videos instantly</p>
+        </header>
+
+        <div class="main-box">
+            <!-- Script Input -->
+            <div class="form-group">
+                <label>📝 Script</label>
+                <textarea id="script" placeholder="Enter your script here... (Urdu, English, or Hindi)"></textarea>
+                <small id="charCount">0 characters</small>
+            </div>
+
+            <!-- Options -->
+            <div class="options-grid">
+                <div class="form-group">
+                    <label>🌍 Language</label>
+                    <select id="language">
+                        <option value="ur">🇵🇰 Urdu</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="hi">🇮🇳 Hindi</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🎨 Style</label>
+                    <select id="style">
+                        <option value="cinematic">🎬 Cinematic</option>
+                        <option value="realistic">📸 Realistic</option>
+                        <option value="cartoon">🎨 Cartoon</option>
+                        <option value="anime">🌸 Anime</option>
+                        <option value="3d">🧊 3D Render</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Video Source Options -->
+            <div class="voice-section">
+                <label>📹 Video Source</label>
+                <div class="voice-options">
+                    <div class="voice-card active" onclick="selectVideoSource('ai')" id="videoAI">
+                        <div class="voice-icon">🤖</div>
+                        <div class="voice-info">
+                            <strong>AI Images</strong>
+                            <small>AI images generate hongi</small>
+                        </div>
+                    </div>
+
+                    <div class="voice-card" onclick="selectVideoSource('upload')" id="videoUpload">
+                        <div class="voice-icon">📹</div>
+                        <div class="voice-info">
+                            <strong>Apni Videos Upload Karo</strong>
+                            <small>MP4, MOV, AVI</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload area (videos) -->
+                <div id="videoUploadArea" class="upload-area" style="display: none;">
+                    <input type="file" id="videoFile" accept=".mp4,.mov,.avi" multiple onchange="uploadVideo()">
+                    <label for="videoFile" class="upload-label">
+                        <span id="videoUploadText">📁 Videos Choose Karo (multiple)</span>
+                    </label>
+                    <small id="videoUploadStatus"></small>
+                </div>
+            </div>
+
+            <!-- Voice Options -->
+            <div class="voice-section">
+                <label>🎙️ Voice Options</label>
+                <div class="voice-options">
+                    <div class="voice-card active" onclick="selectVoice('ai')" id="voiceAI">
+                        <div class="voice-icon">🤖</div>
+                        <div class="voice-info">
+                            <strong>AI Voice</strong>
+                            <small>Script se automatic voice banegi</small>
+                        </div>
+                    </div>
+
+                    <div class="voice-card" onclick="selectVoice('upload')" id="voiceUpload">
+                        <div class="voice-icon">🎤</div>
+                        <div class="voice-info">
+                            <strong>Apni Voice Upload Karo</strong>
+                            <small>MP3, WAV, M4A, OGG</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload area (voice) -->
+                <div id="uploadArea" class="upload-area" style="display: none;">
+                    <input type="file" id="voiceFile" accept=".mp3,.wav,.m4a,.ogg" onchange="uploadVoice()">
+                    <label for="voiceFile" class="upload-label">
+                        <span id="uploadText">📁 Voice File Choose Karo</span>
+                    </label>
+                    <small id="uploadStatus"></small>
+                </div>
+            </div>
+
+            <!-- Video Name -->
+            <div class="form-group">
+                <label>📁 Video Name</label>
+                <input type="text" id="videoName" placeholder="my_video.mp4" value="my_video.mp4">
+            </div>
+
+            <!-- Generate Button -->
+            <button id="generateBtn" onclick="generateVideo()">
+                ✨ Generate Luxury Video
+            </button>
+
+            <!-- Status -->
+            <div id="status" class="status"></div>
+
+            <!-- Video Result -->
+            <div id="videoResult" class="video-result" style="display: none;">
+                <h3>✨ Your Video is Ready</h3>
+                <video id="videoPlayer" controls></video>
+                <a id="downloadLink" class="download-btn" download>⬇️ Download Video</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Crafted with ❤️ by <strong>Abdul Nafeue Babar</strong></p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
